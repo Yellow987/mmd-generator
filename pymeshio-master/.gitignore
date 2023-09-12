@@ -1,0 +1,15 @@
+Makefile
+build
+dist
+pymeshio.egg-info
+*.pyc
+__pycache__/*
+blender26-meshio/pymeshio
+PKG-INFO
+setup.cfg
+.eggs
+*.egg
+*.suo
+.mypy_cache/
+pymeshio_addon*
+resources/
