@@ -10,8 +10,3 @@ if __name__ == "__main__":
   newDf = pd.DataFrame()
   newDf = df_ops.appendFrames(newDf, df)
   vmd_ops.saveDfToVmdFile(newDf, SAVE_FILENAME)
-  
-  # originalVMD = vmd_ops.loadVMD(VMD_TO_LOAD)
-  # df = vmd_ops.convertVMDToDataFrame(originalVMD)
-  # vmd_ops.convertDataFrameToVMD(vmd_ops.initEmptyVmd(), df)
-  # vmd_ops.saveToVMD(SAVE_FILENAME, originalVMD)
