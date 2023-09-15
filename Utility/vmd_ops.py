@@ -1,12 +1,18 @@
 import pymeshio.vmd.reader
 import pymeshio.vmd.writer
 import pandas as pd
+import os 
+
+def createFolderIfNotExists(folder_path):
+  if not os.path.exists(folder_path):
+    os.makedirs(folder_path)
 
 def loadVmdFromFile(filename):
   vmd = pymeshio.vmd.reader.read_from_file(filename)
   return vmd
 
 def saveVmdToFile(filename, vmd):
+  createFolderIfNotExists(os.path.dirname(filename))
   with open(filename, 'wb') as file:
     pymeshio.vmd.writer.write(file, vmd)
 
