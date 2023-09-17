@@ -11,8 +11,9 @@ def apply_func_to_inputData(func, foldername: str):
   Returns:
       None
   """
-  print(foldername)
   for root, dirs, files in os.walk(foldername):
+    if root == foldername:
+      continue
     wav, vmd = "", ""
     for file in files:
       if file.endswith(".wav"):

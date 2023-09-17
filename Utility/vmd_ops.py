@@ -41,7 +41,7 @@ def convertDataFrameToVMD(originalVMD, df):
     return originalVMD
 
 def convertVMDToDataFrame(vmd):
-  boneFrames = [{'frame': motion.frame, 'name': motion.name.decode("shift-jis"), 'position': motion.pos, 'rotation': motion.q, 'complement': motion.complement} for motion in vmd.motions]
+  boneFrames = [{'frame': motion.frame, 'name': motion.name.decode("shift-jis", errors="ignore"), 'position': motion.pos, 'rotation': motion.q, 'complement': motion.complement} for motion in vmd.motions]
   df = pd.DataFrame(boneFrames)
   return df
 
@@ -55,3 +55,81 @@ def getDfFromVMD(VMD_FILENAME):
 def saveDfToVmdFile(df, SAVE_FILENAME):
   newVmd = convertDataFrameToVMD(initEmptyVmd(), df)
   saveVmdToFile(SAVE_FILENAME, newVmd)
+
+def getValidBoneNames():
+  return [
+  "全ての親",
+  "グルーブ",
+  "センター",
+  "上半身",
+  "首",
+  "頭",
+  "左目",
+  "下半身",
+  "左肩",
+  "左腕",
+  "左ひじ",
+  "左手首",
+  "左親指１",
+  "左親指２",
+  "左人指１",
+  "左人指２",
+  "左人指３",
+  "左中指１",
+  "左中指２",
+  "左中指３",
+  "左薬指１",
+  "左薬指２",
+  "左薬指３",
+  "左小指１",
+  "左小指２",
+  "左小指３",
+  "左足",
+  "左ひざ",
+  "左足首",
+  "両目",
+    "左足ＩＫ",
+  "左つま先ＩＫ",
+  "右足ＩＫ",
+  "右つま先ＩＫ",
+  "右目",
+  "右肩",
+  "右腕",
+  "右ひじ",
+  "右手首",
+  "右親指１",
+  "右親指２",
+  "右人指１",
+  "右人指２",
+  "右人指３",
+  "右中指１",
+  "右中指２",
+  "右中指３",
+  "右薬指１",
+  "右薬指２",
+  "右薬指３",
+  "右小指１",
+  "右小指２",
+  "右小指３",
+  "右足",
+  "右ひざ",
+  "右足首"
+]
+
+def filterDataframeForValidBoneNames(df):
+  validBoneNames = getValidBoneNames()
+  return df[df['name'].isin(validBoneNames)]
+
+def findInvalidDuplicateNames(df):
+  validBoneNames = getValidBoneNames()
+  
+  # Count the occurrences of each name
+  name_counts = df['name'].value_counts()
+  
+  # Filter for names that occur more than once
+  duplicate_names = name_counts[name_counts > 1].index.tolist()
+  
+  # Filter out valid bone names
+  invalid_duplicate_names = [name for name in duplicate_names if name not in validBoneNames]
+  
+  return invalid_duplicate_names
