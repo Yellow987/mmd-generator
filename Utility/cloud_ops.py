@@ -91,9 +91,6 @@ def update_index_mapping_body(client, index_name, settings):
   print('\nUpdating index mappings:')
   print(update_response)
 
-client = create_client()
-print(client.ping())
-
 #create_index(client, 'frames-index', settingsSettings.update(settingsBody))
 #get_indices(client)
 #delete_index(client, 'frame-index')
