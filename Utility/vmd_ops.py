@@ -62,6 +62,7 @@ def getValidBoneNames():
   "グルーブ",
   "センター",
   "上半身",
+  "上半身2",
   "首",
   "頭",
   "左目",
@@ -70,6 +71,7 @@ def getValidBoneNames():
   "左腕",
   "左ひじ",
   "左手首",
+  "左親指０"
   "左親指１",
   "左親指２",
   "左人指１",
@@ -88,7 +90,7 @@ def getValidBoneNames():
   "左ひざ",
   "左足首",
   "両目",
-    "左足ＩＫ",
+  "左足ＩＫ",
   "左つま先ＩＫ",
   "右足ＩＫ",
   "右つま先ＩＫ",
@@ -116,9 +118,47 @@ def getValidBoneNames():
   "右足首"
 ]
 
+def getCoreBoneNames():
+  return [
+  "全ての親",
+  "グルーブ",
+  "センター",
+  "上半身",
+  "上半身2",
+  "首",
+  "頭",
+  "下半身",
+  "左肩",
+  "左腕",
+  "左ひじ",
+  "左手首",
+  "左足",
+  "左ひざ",
+  "左足首",
+  "左足ＩＫ",
+  "左つま先ＩＫ",
+  "右足ＩＫ",
+  "右つま先ＩＫ",
+  "右肩",
+  "右腕",
+  "右ひじ",
+  "右手首",
+  "右足",
+  "右ひざ",
+  "右足首"
+]
+
 def filterDataframeForValidBoneNames(df):
   validBoneNames = getValidBoneNames()
   return df[df['name'].isin(validBoneNames)]
+
+def filterDataframeForCoreBoneNames(df):
+  validBoneNames = getCoreBoneNames()
+  return df[df['name'].isin(validBoneNames)]
+
+def findMissingBoneNames(df):
+  validBoneNames = getValidBoneNames()
+  return [name for name in validBoneNames if name not in df['name'].tolist()]
 
 def findInvalidDuplicateNames(df):
   validBoneNames = getValidBoneNames()
