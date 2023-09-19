@@ -16,7 +16,7 @@ def saveVmdToFile(filename, vmd):
   with open(filename, 'wb') as file:
     pymeshio.vmd.writer.write(file, vmd)
 
-def convertDataFrameToVMD(originalVMD, df):
+def convertDataFrameToVMD(df, originalVMD=None, customComplement=None):
     class Motion:
       __slots__=['name', 'frame', 'pos', 'q', 'complement']
       def __init__(self, frame, name, pos, q, complement):
@@ -34,9 +34,11 @@ def convertDataFrameToVMD(originalVMD, df):
         rotation = row['rotation']
         complement = row['complement']
 
-        motion = Motion(frame, name, position, rotation, complement)
+        motion = Motion(frame, name, position, rotation, complement if customComplement is None else customComplement)
         motionArray.append(motion)
 
+    if originalVMD is None:
+      originalVMD = initEmptyVmd()
     originalVMD.motions = motionArray
     return originalVMD
 
@@ -49,7 +51,7 @@ def initEmptyVmd():
   motion = pymeshio.vmd.Motion()
   return motion
 
-def getDfFromVMD(VMD_FILENAME):
+def getDfFromVmdFileName(VMD_FILENAME):
   return convertVMDToDataFrame(loadVmdFromFile(VMD_FILENAME))
 
 def saveDfToVmdFile(df, SAVE_FILENAME):
@@ -121,8 +123,8 @@ def getValidBoneNames():
 def getCoreBoneNames():
   return [
   "全ての親",
-  "グルーブ",
-  "センター",
+  #"グルーブ",
+  "センター", #position + rotation
   "上半身",
   "上半身2",
   "首",
@@ -135,10 +137,10 @@ def getCoreBoneNames():
   "左足",
   "左ひざ",
   "左足首",
-  "左足ＩＫ",
-  "左つま先ＩＫ",
-  "右足ＩＫ",
-  "右つま先ＩＫ",
+  "左足ＩＫ", #position + rotation
+  #"左つま先ＩＫ",
+  "右足ＩＫ", #position + rotation
+  #"右つま先ＩＫ",
   "右肩",
   "右腕",
   "右ひじ",
@@ -147,6 +149,9 @@ def getCoreBoneNames():
   "右ひざ",
   "右足首"
 ]
+
+def getBonesWherePositionIsUsed():
+  return ["センター", "左足ＩＫ", "右足ＩＫ"]
 
 def filterDataframeForValidBoneNames(df):
   validBoneNames = getValidBoneNames()
@@ -158,6 +163,10 @@ def filterDataframeForCoreBoneNames(df):
 
 def findMissingBoneNames(df):
   validBoneNames = getValidBoneNames()
+  return [name for name in validBoneNames if name not in df['name'].tolist()]
+
+def findMissingCoreBoneNames(df):
+  validBoneNames = getCoreBoneNames()
   return [name for name in validBoneNames if name not in df['name'].tolist()]
 
 def findInvalidDuplicateNames(df):

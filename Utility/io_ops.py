@@ -25,4 +25,5 @@ def apply_func_to_inputData(func, foldername: str):
     if wav == "" and vmd == "":
       print("MISSING FILE FOR " + root)
 
-    func(wav, vmd)
+    folderName = root.split("\\")[-1]
+    func(wav, vmd, folderName)

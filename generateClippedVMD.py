@@ -13,9 +13,11 @@ if __name__ == "__main__":
 
   def print_file_name(wav, vmd):
     df = vmd_ops.convertVMDToDataFrame(vmd_ops.loadVmdFromFile(vmd))
-    print(vmd_ops.findMissingBoneNames(df))
+    print(vmd_ops.findMissingCoreBoneNames(df))
+    df = df[df['name'] == '左足']
+    print(df.head(100).tail(10))
 
-  #io_ops.apply_func_to_inputData(print_file_name, INPUT_DATA_FOLDER)
-  df = vmd_ops.convertVMDToDataFrame(vmd_ops.loadVmdFromFile(VMD_TO_LOAD))
-  df = vmd_ops.filterDataframeForCoreBoneNames(df)
-  vmd_ops.saveDfToVmdFile(df, SAVE_FOLDER + SAVE_FILENAME + '.vmd')
+  io_ops.apply_func_to_inputData(print_file_name, INPUT_DATA_FOLDER)
+  #df = vmd_ops.convertVMDToDataFrame(vmd_ops.loadVmdFromFile(VMD_TO_LOAD))
+  #df = vmd_ops.filterDataframeForCoreBoneNames(df)
+  #vmd_ops.saveDfToVmdFile(df, SAVE_FOLDER + SAVE_FILENAME + '.vmd')

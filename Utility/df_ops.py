@@ -18,6 +18,9 @@ def parseFramesFromDf(df, start, end):
 def getLastFrame(df):
   return df['frame'].max() if not df.empty else 0
 
+def sortDf(df):
+  return df.sort_values(by=['frame', 'name'])
+
 def processSongAndMotionIntoClips(wav, vmd):
   df = vmd_ops.getDfFromVMD(VMD_TO_LOAD)
   beatFrames = music_ops.get_beatFrames_from_filepath(SONG_TO_LOAD)
