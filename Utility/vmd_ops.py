@@ -54,8 +54,11 @@ def initEmptyVmd():
 def getDfFromVmdFileName(VMD_FILENAME):
   return convertVMDToDataFrame(loadVmdFromFile(VMD_FILENAME))
 
-def saveDfToVmdFile(df, SAVE_FILENAME):
-  newVmd = convertDataFrameToVMD(initEmptyVmd(), df)
+def getComplement(df):
+  return df['complement'].iloc[0]
+
+def saveDfToVmdFile(df, SAVE_FILENAME, originalVMD=None, customComplement=None):
+  newVmd = convertDataFrameToVMD(df, originalVMD, customComplement)
   saveVmdToFile(SAVE_FILENAME, newVmd)
 
 def getValidBoneNames():
