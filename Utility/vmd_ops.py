@@ -76,7 +76,7 @@ def getValidBoneNames():
   "左腕",
   "左ひじ",
   "左手首",
-  "左親指０"
+  "左親指０",
   "左親指１",
   "左親指２",
   "左人指１",
@@ -104,6 +104,7 @@ def getValidBoneNames():
   "右腕",
   "右ひじ",
   "右手首",
+  "右親指０",
   "右親指１",
   "右親指２",
   "右人指１",
@@ -120,38 +121,46 @@ def getValidBoneNames():
   "右小指３",
   "右足",
   "右ひざ",
-  "右足首"
+  "右足首",
+  "右腕捩",
+  "左腕捩",
+  "左手捩",
+  "右手捩",
 ]
 
 def getCoreBoneNames():
   return [
-  "全ての親",
-  #"グルーブ",
+  #"グルーブ", #position + rotation (groove bone need be moved to center bone)
   "センター", #position + rotation
   "上半身",
   "上半身2",
   "首",
-  "頭",
+  "頭",  #5
   "下半身",
   "左肩",
   "左腕",
   "左ひじ",
-  "左手首",
+  #"左手首", #(hand bone not used)  #10
   "左足",
   "左ひざ",
   "左足首",
   "左足ＩＫ", #position + rotation
   #"左つま先ＩＫ",
-  "右足ＩＫ", #position + rotation
+  "右足ＩＫ", #position + rotation 15
   #"右つま先ＩＫ",
   "右肩",
   "右腕",
   "右ひじ",
-  "右手首",
-  "右足",
+  #"右手首", #(hand bone not used)
+  "右足",  #20
   "右ひざ",
-  "右足首"
-]
+  "右足首",
+  "右腕捩",
+  "左腕捩",
+  #"左手捩", #(hand bone not used) #25
+  #"右手捩", #(hand bone not used)
+  #"全ての親", #Mother bone not relevant for vectorization
+] #97
 
 def getBonesWherePositionIsUsed():
   return ["センター", "左足ＩＫ", "右足ＩＫ"]
@@ -172,7 +181,16 @@ def findMissingCoreBoneNames(df):
   validBoneNames = getCoreBoneNames()
   return [name for name in validBoneNames if name not in df['name'].tolist()]
 
-def findInvalidDuplicateNames(df):
+def printVmdDetails(vmd="", df=None):
+  if df is None:
+    df = getDfFromVmdFileName(vmd)
+  print("Number of frames: " + str(len(df)))
+  print("Number of bones: " + str(len(df['name'].unique())))
+  print("Missing bones: " + str(findMissingBoneNames(df)))
+  print("Missing core bones: " + str(findMissingCoreBoneNames(df)))
+  print("Common bones that are not considered valid: " + str(findCommonBonesThatAreNotConsideredValid(df)))
+
+def findCommonBonesThatAreNotConsideredValid(df):
   validBoneNames = getValidBoneNames()
   
   # Count the occurrences of each name

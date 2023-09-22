@@ -2,8 +2,9 @@ import pandas as pd
 import pymeshio.common
 
 def saveDfToFeather(df, filepath):
-  df.loc[:, 'position'] = df['position'].apply(lambda v: (v.x, v.y, v.z))
-  df.loc[:, 'rotation'] = df['rotation'].apply(lambda v: (v.x, v.y, v.z, v.w))
+  df = df.copy()
+  df['position'] = df['position'].apply(lambda v: (v.x, v.y, v.z))
+  df['rotation'] = df['rotation'].apply(lambda v: (v.x, v.y, v.z, v.w))
   df.to_feather(filepath)
 
 def loadDfFromFeather(filepath):
