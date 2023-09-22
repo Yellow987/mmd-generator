@@ -1,7 +1,6 @@
 import pymeshio.common
-import df_ops, vmd_ops
+from Utility import df_ops, vmd_ops
 import pandas as pd
-
 
 def getMissingBones(df, boneList):
   df_bone_names_set = set(df['name'])
@@ -38,6 +37,15 @@ def calculateVector4Porportion(currentFrame, lastBoneOccurence, nextBoneOccurenc
       lastBoneOccurence['rotation'].z + (nextBoneOccurence['rotation'].z - lastBoneOccurence['rotation'].z) * porportion,
       lastBoneOccurence['rotation'].w + (nextBoneOccurence['rotation'].w - lastBoneOccurence['rotation'].w) * porportion
     )
+  
+def updateBoneListsForNextOccurenceOfBone(boneName, currentFrameNumber, lastFrame, lastBoneList, nextBoneList, df):
+  lastBoneList[boneName] = nextBoneList[boneName]
+  nextBoneOccurenceValues = getNextBoneOccurence(df, boneName, currentFrameNumber)
+  if nextBoneOccurenceValues is not None:
+    nextBoneList[boneName] = nextBoneOccurenceValues
+  else:
+    nextBoneList[boneName] = {"frameNumber": lastFrame, "position": lastBoneList[boneName]['position'], "rotation": lastBoneList[boneName]['rotation']}
+  return lastBoneList, nextBoneList
 
 import pymeshio.common
 def addInterpolationsToEachFrame(df):
@@ -57,9 +65,7 @@ def addInterpolationsToEachFrame(df):
     missingBonesOfCurrentFrame = getMissingBones(frameDf, boneNames)
     for missingBone in missingBonesOfCurrentFrame:
       if currentFrameNumber > nextBoneList[missingBone]['frameNumber']:
-        lastBoneList[missingBone] = nextBoneList[missingBone]
-        nextBoneOccurenceValues = getNextBoneOccurence(df, missingBone, currentFrameNumber)
-        nextBoneList[missingBone] = nextBoneOccurenceValues if nextBoneOccurenceValues is not None else nextBoneList[missingBone]
+        lastBoneList, nextBoneList = updateBoneListsForNextOccurenceOfBone(missingBone, currentFrameNumber, lastFrame, lastBoneList, nextBoneList, df)
       newFrames.append([
         currentFrameNumber,
         missingBone,
@@ -73,4 +79,7 @@ def addInterpolationsToEachFrame(df):
   interpolated_df = df_ops.sortDf(interpolated_df)
   interpolated_df['complement'] = complement
   return interpolated_df
+
+def keepAnimationCentered(df):
+  df = df.copy()
   
