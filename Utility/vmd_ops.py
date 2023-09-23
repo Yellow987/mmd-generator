@@ -142,8 +142,8 @@ def getCoreBoneNames():
   "左ひじ",
   #"左手首", #(hand bone not used)  #10
   "左足",
-  "左ひざ",
-  "左足首",
+  #"左ひざ", no knee bone
+  #"左足首", no ankle bone
   "左足ＩＫ", #position + rotation
   #"左つま先ＩＫ",
   "右足ＩＫ", #position + rotation 15
@@ -153,14 +153,14 @@ def getCoreBoneNames():
   "右ひじ",
   #"右手首", #(hand bone not used)
   "右足",  #20
-  "右ひざ",
-  "右足首",
+  #"右ひざ", no knee bone
+  #"右足首", no ankle bone
   "右腕捩",
   "左腕捩",
   #"左手捩", #(hand bone not used) #25
   #"右手捩", #(hand bone not used)
   #"全ての親", #Mother bone not relevant for vectorization
-] #97
+] #81
 
 def getBonesWherePositionIsUsed():
   return ["センター", "左足ＩＫ", "右足ＩＫ"]
