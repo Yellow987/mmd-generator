@@ -80,11 +80,38 @@ def addInterpolationsToEachFrame(df):
   interpolated_df['complement'] = complement
   return interpolated_df
 
-from scipy.spatial.transform import Rotation as R
-def rotate_point_around_y_axis(point, angle_degrees):
-  xyzpoint = [point.x, point.y, point.z]
-  r = R.from_euler('y', angle_degrees, degrees=True)
-  rotated_point = r.apply(xyzpoint)
+def rotate_point_around_wy_axis(point, centerRotation):
+  vec3 = point.values[0]
+  xyzpoint = (vec3.x, vec3.y, vec3.z)
+  quaternion = (centerRotation.w, centerRotation.x, centerRotation.y, centerRotation.z)
+
+  def quaternion_multiply(q1, q2):
+    w1, x1, y1, z1 = q1
+    w2, x2, y2, z2 = q2
+    w = w1 * w2 - x1 * x2 - y1 * y2 - z1 * z2
+    x = w1 * x2 + x1 * w2 + y1 * z2 - z1 * y2
+    y = w1 * y2 + y1 * w2 + z1 * x2 - x1 * z2
+    z = w1 * z2 + z1 * w2 + x1 * y2 - y1 * x2
+    return (w, x, y, z)
+
+  def quaternion_conjugate(q):
+    w, x, y, z = q
+    return (w, -x, -y, -z)
+
+  def rotate_point_by_quaternion(point, quaternion):
+    # Represent the point as a quaternion
+    point_quaternion = (0, point[0], point[1], point[2])
+    
+    # Calculate the rotated point
+    q_conjugate = quaternion_conjugate(quaternion)
+    new_point_quaternion = quaternion_multiply(quaternion_multiply(quaternion, point_quaternion), q_conjugate)
+    
+    # Extract the x, y, z coordinates from the resulting quaternion
+    _, x, y, z = new_point_quaternion
+    return (x, y, z)
+  
+  rotated_point = rotate_point_by_quaternion(xyzpoint, quaternion)
+  
   return pymeshio.common.Vector3(rotated_point[0], rotated_point[1], rotated_point[2])
 
 def normalizePositionsToCenter(df):
@@ -114,29 +141,24 @@ def normalizePositionsToCenter(df):
           newFrames.append([
             currentFrameNumber,
             footIKBone,
-            interpolate.rotate_point_around_y_axis(interpolatedFootBonePosition - nextBoneList[centerBone]['position'], nextBoneList[centerBone]['rotation'].y),
-            interpolate.calculateQuaternionPorportion(currentFrameNumber, lastBoneList[footIKBone], nextBoneList[footIKBone])
+            interpolate.rotate_point_around_wy_axis(interpolatedFootBonePosition - nextBoneList[centerBone]['position'], nextBoneList[centerBone]['rotation']),
+            interpolate.calculateVector4Porportion(currentFrameNumber, lastBoneList[footIKBone], nextBoneList[footIKBone])
           ])
         for footIKBone in [footIKBone for footIKBone in footIKBones if footIKBone in presentBonesOfBoneList]:
           df_position_bones.loc[(df_position_bones['frame'] == currentFrameNumber) & (df_position_bones['name'] == footIKBone), 'position'] -= nextBoneList[centerBone]['position']
-          df_position_bones.loc[(df_position_bones['frame'] == currentFrameNumber) & (df_position_bones['name'] == footIKBone), 'position'] = interpolate.rotate_point_around_y_axis(df_position_bones.loc[(df_position_bones['frame'] == currentFrameNumber) & (df_position_bones['name'] == footIKBone), 'position'], nextBoneList[centerBone]['rotation'].y)
+          df_position_bones.loc[(df_position_bones['frame'] == currentFrameNumber) & (df_position_bones['name'] == footIKBone), 'position'].values[0] = interpolate.rotate_point_around_wy_axis(df_position_bones.loc[(df_position_bones['frame'] == currentFrameNumber) & (df_position_bones['name'] == footIKBone), 'position'], nextBoneList[centerBone]['rotation'])
         break
       else:
         interpolatedCenterBonePosition = interpolate.calculateVector3Porportion(currentFrameNumber, lastBoneList[centerBone], nextBoneList[centerBone])
-        interpolatedCenterBoneRotation = interpolate.calculateQuaternionPorportion(currentFrameNumber, lastBoneList[centerBone], nextBoneList[centerBone])
+        interpolatedCenterBoneRotation = interpolate.calculateVector4Porportion(currentFrameNumber, lastBoneList[centerBone], nextBoneList[centerBone])
         df_position_bones.loc[(df_position_bones['frame'] == currentFrameNumber) & (df_position_bones['name'] == boneName), 'position'] -= interpolatedCenterBonePosition
-        df_position_bones.loc[(df_position_bones['frame'] == currentFrameNumber) & (df_position_bones['name'] == boneName), 'position'] = interpolate.rotate_point_around_y_axis(df_position_bones.loc[(df_position_bones['frame'] == currentFrameNumber) & (df_position_bones['name'] == boneName), 'position'], interpolatedCenterBoneRotation.y)
+        df_position_bones.loc[(df_position_bones['frame'] == currentFrameNumber) & (df_position_bones['name'] == boneName), 'position'].values[0] = interpolate.rotate_point_around_wy_axis(df_position_bones.loc[(df_position_bones['frame'] == currentFrameNumber) & (df_position_bones['name'] == boneName), 'position'], interpolatedCenterBoneRotation)
   newFramesDf = pd.DataFrame(newFrames, columns=['frame', 'name', 'position', 'rotation'])
   normalized_to_center_df = df.copy()
   normalized_to_center_df.update(df_position_bones, overwrite=True)
   normalized_to_center_df = pd.concat([normalized_to_center_df, newFramesDf])
   normalized_to_center_df = df_ops.sortDf(normalized_to_center_df)
   normalized_to_center_df['complement'] = complement
-  def set_position(row, centerBone):
-    if row['name'] == centerBone:
-      return pymeshio.common.Vector3(0, 0, 0)
-    else:
-      return row['position']
-  normalized_to_center_df['position'] = normalized_to_center_df.apply(lambda row: set_position(row, centerBone), axis=1)
+  normalized_to_center_df = normalized_to_center_df[normalized_to_center_df['name'] != centerBone]
   normalized_to_center_df = df_ops.sortDf(normalized_to_center_df)
   return normalized_to_center_df

@@ -26,6 +26,10 @@ def appendFrames(df1, df2, buffer=0):
 
 def parseFramesFromDf(df, start, end):
   filtered_df = df[(df['frame'] >= start) & (df['frame'] <= end)]
+  
+  # Reset the index of the filtered DataFrame
+  filtered_df = filtered_df.reset_index(drop=True)
+  
   return filtered_df
 
 def getLastFrame(df):

@@ -8,7 +8,7 @@ load_dotenv()
 def initPinecone():
   pinecone.init(      
     api_key=os.getenv('PINECONE_API_KEY'),
-    environment='gcp-starter'      
+    environment=os.getenv('PINECONE_ENVIRONMENT')   
   )
   return pinecone
 
@@ -38,26 +38,22 @@ class FrameForVectorization:
   @staticmethod
   def getCoreBoneNames():
     return {
-      "センター": {'rotation_weight': 3, 'position_weight': 1},
-      "上半身": {'rotation_weight': 3},
-      "上半身2": {'rotation_weight': 3},
+      #"センター": {'rotation_weight': 3, 'position_weight': 1},
+      "上半身": {'rotation_weight': 1},
+      "上半身2": {'rotation_weight': 1},
       "首": {'rotation_weight': 1},
       "頭": {'rotation_weight': 1},
-      "下半身": {'rotation_weight': 3},
+      "下半身": {'rotation_weight': 1},
       "左肩": {'rotation_weight': 1},
       "左腕": {'rotation_weight': 1},
       "左ひじ": {'rotation_weight': 1},
       "左足": {'rotation_weight': 1},
-      #"左ひざ": {'rotation_weight': 1},
-      #"左足首": {'rotation_weight': 1},
       "左足ＩＫ": {'rotation_weight': 1, 'position_weight': 1},
       "右足ＩＫ": {'rotation_weight': 1, 'position_weight': 1},
       "右肩": {'rotation_weight': 1},
       "右腕": {'rotation_weight': 1},
       "右ひじ": {'rotation_weight': 1},
       "右足": {'rotation_weight': 1},
-      #"右ひざ": {'rotation_weight': 1},
-      #"右足首": {'rotation_weight': 1},
       "右腕捩": {'rotation_weight': 1},
       "左腕捩": {'rotation_weight': 1}
     }
@@ -88,7 +84,7 @@ def upsertDfAnimation(pinecone, df, animationName):
   vectorsOfFrames = []
   for currentFrameNumber in range(0, lastFrame + 1):
     vectorsOfFrames.append(vectorizeFrame(df, currentFrameNumber, animationName))
-  index = pinecone.Index('')
+  index = pinecone.Index('frames')
   
   for ids_vectors_chunk in chunks(vectorsOfFrames, batch_size=100):
     index.upsert(vectors=ids_vectors_chunk)
