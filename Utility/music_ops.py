@@ -47,6 +47,9 @@ def get_beatTimesInSeconds(y, sr):
     beatTimes = librosa.frames_to_time(beat_frames, sr=sr)
     return beatTimes
 
+def get_secondFromFrameNumber30Fps(frame_number):
+    return frame_number / 30
+
 def get_songDurationInSeconds(y, sr):
     return librosa.get_duration(y=y, sr=sr)
 
