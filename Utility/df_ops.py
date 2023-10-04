@@ -18,6 +18,9 @@ def appendFrames(df1, df2, buffer=0):
     first_frame_df2 = df2['frame'].min() if not df2.empty else 0
     frame_shift = first_frame_df2 - last_frame_df1 
     
+    if df1.empty:
+      buffer = 0
+
     df2_copy = df2.copy()
     df2_copy['frame'] = df2_copy['frame'] - (frame_shift - buffer)
     
