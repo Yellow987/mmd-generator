@@ -1,3 +1,4 @@
 /inputData
 /generatedData
-.env
+.*
+pretrained_models

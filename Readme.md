@@ -1,3 +1,3 @@
-install pymeshio
-cd pymeshio-x.x.x
+you need to install pymeshio
+cd .\pymeshio-master\
 python setup.py install
